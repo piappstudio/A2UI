@@ -1,5 +1,6 @@
 package com.piappstudio.a2ui
 
+import com.piappstudio.a2ui.a2ui.agent.JournalSurfaceAgent
 import com.piappstudio.a2ui.data.model.Mood
 import com.piappstudio.a2ui.data.repository.JournalRepositoryImpl
 import com.piappstudio.a2ui.ui.viewmodel.JournalViewModel
@@ -40,6 +41,10 @@ class JournalViewModelTest {
         val state = viewModel.uiState.value
         assertNotNull(viewModel.messageProcessor)
         assertTrue(state.entries.isNotEmpty())
+        assertNull(viewModel.protocolError.value)
+        val surface = viewModel.activeSurfaces.value
+            .firstOrNull { it.id == JournalSurfaceAgent.SURFACE_ID }
+        assertNotNull(surface)
     }
 
     @Test

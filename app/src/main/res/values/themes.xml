@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.A2UI" parent="Theme.MaterialComponents.Light" />
+</resources>

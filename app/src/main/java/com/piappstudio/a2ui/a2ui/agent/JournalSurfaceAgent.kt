@@ -13,11 +13,180 @@ import com.piappstudio.a2ui.data.model.Mood
 /**
  * Builds the A2UI server-to-client stream for the sanctuary journal.
  *
- * Structure and data are separate messages, matching the protocol:
- * [createSurface] chooses the catalog, [updateComponents] sends the flat
- * adjacency list (one component must use id "root"), and [updateDataModel]
- * fills the bindings those components read. A remote agent, including Gemini,
- * would emit the same three messages as JSON.
+ * Structure and data are separate messages: [createSurface] chooses the catalog,
+ * [updateComponents] sends the flat adjacency list (one component must use id
+ * "root"), and [updateDataModel] fills the bindings those components read.
+ *
+ * A remote agent sends the same documents as JSON. [com.piappstudio.a2ui.ui.viewmodel.JournalViewModel.onAgentMessage]
+ * parses one object per call. Do not wrap the stream in an array. `version` is
+ * required and must be `v0.9` or `v0.9.1`. The component type is the JSON field
+ * `component`. Every other field on that object is a property. A binding is
+ * `{"path": "..."}`. A path that starts with `/` is absolute. A path without `/`
+ * is relative to the template item (`/entries/0`, `/entries/1`, ...). Send the
+ * messages in this order.
+ *
+ * ```
+ * {
+ *   "version": "v0.9",
+ *   "createSurface": {
+ *     "surfaceId": "journal_surface",
+ *     "catalogId": "https://piappstudio.com/a2ui/catalogs/sanctuary-journal/v1",
+ *     "theme": {},
+ *     "sendDataModel": true
+ *   }
+ * }
+ * ```
+ *
+ * ```
+ * {
+ *   "version": "v0.9",
+ *   "updateComponents": {
+ *     "surfaceId": "journal_surface",
+ *     "components": [
+ *       {
+ *         "id": "root",
+ *         "component": "JournalScreen",
+ *         "header": "header",
+ *         "moodFilter": "mood_filter",
+ *         "search": "search_field",
+ *         "entries": { "componentId": "entry_card", "path": "/entries" },
+ *         "addDialog": "add_dialog",
+ *         "detailDialog": "detail_dialog"
+ *       },
+ *       {
+ *         "id": "header",
+ *         "component": "SanctuaryHeader",
+ *         "badge": "🌿 DAILY SANCTUARY",
+ *         "title": "Breathe deeply, reflect softly.",
+ *         "subtitle": "Capture your quiet moments in nature and let your mind unwind.",
+ *         "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+ *       },
+ *       {
+ *         "id": "mood_filter",
+ *         "component": "MoodFilter",
+ *         "selected": { "path": "/ui/selectedMood" },
+ *         "selectEvent": "selectMood"
+ *       },
+ *       {
+ *         "id": "search_field",
+ *         "component": "SearchField",
+ *         "value": { "path": "/ui/searchQuery" },
+ *         "changeEvent": "searchChanged"
+ *       },
+ *       {
+ *         "id": "entry_card",
+ *         "component": "JournalCard",
+ *         "entryId": { "path": "id" },
+ *         "title": { "path": "title" },
+ *         "content": { "path": "content" },
+ *         "mood": { "path": "mood" },
+ *         "emoji": { "path": "emoji" },
+ *         "date": { "path": "date" },
+ *         "banner": { "path": "banner" },
+ *         "openEvent": "openEntry",
+ *         "deleteEvent": "deleteEntry"
+ *       },
+ *       {
+ *         "id": "add_dialog",
+ *         "component": "AddEntryDialog",
+ *         "open": { "path": "/ui/addOpen" },
+ *         "title": { "path": "/draft/title" },
+ *         "content": { "path": "/draft/content" },
+ *         "mood": { "path": "/draft/mood" },
+ *         "banner": { "path": "/draft/banner" },
+ *         "saveEvent": "saveEntry",
+ *         "dismissEvent": "dismissAdd"
+ *       },
+ *       {
+ *         "id": "detail_dialog",
+ *         "component": "EntryDetailDialog",
+ *         "open": { "path": "/ui/detailOpen" },
+ *         "entryId": { "path": "/ui/selectedEntry/id" },
+ *         "title": { "path": "/ui/selectedEntry/title" },
+ *         "content": { "path": "/ui/selectedEntry/content" },
+ *         "mood": { "path": "/ui/selectedEntry/mood" },
+ *         "emoji": { "path": "/ui/selectedEntry/emoji" },
+ *         "date": { "path": "/ui/selectedEntry/date" },
+ *         "banner": { "path": "/ui/selectedEntry/banner" },
+ *         "closeEvent": "dismissDetail",
+ *         "deleteEvent": "deleteEntry"
+ *       }
+ *     ]
+ *   }
+ * }
+ * ```
+ *
+ * The value at path `/` must be a JSON object. A list at the root is rejected.
+ * `null` deletes that path.
+ *
+ * ```
+ * {
+ *   "version": "v0.9",
+ *   "updateDataModel": {
+ *     "surfaceId": "journal_surface",
+ *     "path": "/",
+ *     "value": {
+ *       "ui": {
+ *         "selectedMood": "",
+ *         "searchQuery": "",
+ *         "addOpen": false,
+ *         "detailOpen": false,
+ *         "selectedEntry": {
+ *           "id": "",
+ *           "title": "",
+ *           "content": "",
+ *           "mood": "",
+ *           "emoji": "",
+ *           "date": "",
+ *           "banner": ""
+ *         }
+ *       },
+ *       "draft": {
+ *         "title": "",
+ *         "content": "",
+ *         "mood": "Peaceful",
+ *         "banner": ""
+ *       },
+ *       "entries": [
+ *         {
+ *           "id": "entry-1",
+ *           "title": "Spring Rain in the Fern Glen",
+ *           "content": "The path was quiet and the ferns held the rain.",
+ *           "mood": "Renewed",
+ *           "emoji": "🌸",
+ *           "date": "Oct 18, 2026 • 10:47 PM",
+ *           "banner": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80"
+ *         }
+ *       ]
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * Later updates touch one path so search text, the draft, and dialog flags stay
+ * put. Replacing `/entries` re-renders the card template. Opening the add dialog
+ * is two messages: reset `/draft`, then set `/ui/addOpen` to true.
+ *
+ * ```
+ * {
+ *   "version": "v0.9",
+ *   "updateDataModel": {
+ *     "surfaceId": "journal_surface",
+ *     "path": "/entries",
+ *     "value": []
+ *   }
+ * }
+ * ```
+ *
+ * ```
+ * { "version": "v0.9", "deleteSurface": { "surfaceId": "journal_surface" } }
+ * ```
+ *
+ * Clicks stay in the app. The widgets resolve their bindings and emit a client
+ * event whose `type` is the event name from the component (`selectMood`,
+ * `searchChanged`, `openEntry`, `deleteEntry`, `saveEntry`, `dismissAdd`,
+ * `dismissDetail`). Card actions carry the already-bound literal id, because a
+ * relative path in action context is resolved from `/`, not from the list item.
  */
 object JournalSurfaceAgent {
     const val SURFACE_ID: String = "journal_surface"

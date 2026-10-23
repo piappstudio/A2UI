@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
     implementation(libs.material)
     implementation(libs.moshi.kotlin)
@@ -90,8 +91,9 @@ dependencies {
     "ksp"(libs.moshi.kotlin.codegen)
     implementation(libs.androidx.a2ui.engine)
     implementation(libs.androidx.a2ui.model)
-    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.a2ui.compose.runtime)
     implementation(libs.compose.ui)
+    implementation(libs.androidx.material3.a2ui)
 }
 
 tasks.matching { it.name.contains("AarMetadata") }.configureEach {

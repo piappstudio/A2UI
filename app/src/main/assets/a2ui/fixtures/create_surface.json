@@ -1,0 +1,12 @@
+{
+  "version": "v0.9",
+  "createSurface": {
+    "surfaceId": "wf_transfer",
+    "catalogId": "https://piappstudio.com/a2ui/catalogs/trustbank-banking/v1",
+    "theme": {
+      "primaryColor": "#0B4F6C",
+      "agentDisplayName": "TrustBank Assistant"
+    },
+    "sendDataModel": true
+  }
+}

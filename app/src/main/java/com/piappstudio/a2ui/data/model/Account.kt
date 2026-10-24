@@ -1,14 +1,17 @@
 package com.piappstudio.a2ui.data.model
 
 enum class AccountType {
-    CHECKING, SAVINGS, INVESTMENT
+    CHECKING,
+    SAVINGS,
+    INVESTMENT,
 }
 
 data class Account(
     val id: String,
     val name: String,
     val accountNumber: String,
+    val maskedNumber: String,
     val balance: Double,
-    val currency: String = "$",
-    val type: AccountType
+    val currency: String = "USD",
+    val type: AccountType,
 )

@@ -1,0 +1,45 @@
+{
+  "version": "v0.9",
+  "updateComponents": {
+    "surfaceId": "wf_transfer",
+    "components": [
+      {
+        "id": "root",
+        "component": "Column",
+        "children": ["title", "amount", "review_btn"]
+      },
+      {
+        "id": "title",
+        "component": "Text",
+        "text": "Secure fund transfer",
+        "variant": "h3"
+      },
+      {
+        "id": "amount",
+        "component": "TextField",
+        "label": "Amount",
+        "value": { "path": "/draft/amount" },
+        "variant": "number"
+      },
+      {
+        "id": "review_btn",
+        "component": "Button",
+        "child": "review_lbl",
+        "variant": "primary",
+        "action": {
+          "event": {
+            "name": "reviewTransfer",
+            "context": {
+              "amount": { "path": "/draft/amount" }
+            }
+          }
+        }
+      },
+      {
+        "id": "review_lbl",
+        "component": "Text",
+        "text": "Review transfer"
+      }
+    ]
+  }
+}

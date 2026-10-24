@@ -1,11 +1,25 @@
 package com.piappstudio.a2ui.data.model
 
+data class MerchantInfo(
+    val name: String,
+    val category: String,
+    val contact: String? = null,
+    val city: String? = null,
+    val country: String? = null,
+    val verifiedLatitude: Double? = null,
+    val verifiedLongitude: Double? = null,
+)
+
 data class Transaction(
     val id: String,
-    val merchantName: String,
+    val accountId: String,
+    val merchant: MerchantInfo,
     val amount: Double,
-    val date: String,
-    val category: String,
+    val currency: String = "USD",
+    val dateLabel: String,
+    val isoTimestamp: String,
+    val status: String,
     val isHighRisk: Boolean = false,
-    val accountId: String
+    val disputeEligible: Boolean = true,
+    val locationVerified: Boolean = false,
 )

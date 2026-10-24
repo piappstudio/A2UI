@@ -11,59 +11,54 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NatureGreenPrimaryDark,
-    onPrimary = NatureGreenOnPrimaryDark,
-    primaryContainer = NatureGreenContainerDark,
-    onPrimaryContainer = NatureGreenOnContainerDark,
-    secondary = NatureTealSecondaryDark,
-    onSecondary = NatureTealOnSecondaryDark,
-    secondaryContainer = NatureTealContainerDark,
-    onSecondaryContainer = NatureTealOnContainerDark,
-    tertiary = NatureGoldTertiaryDark,
-    onTertiary = NatureGoldOnTertiaryDark,
-    tertiaryContainer = NatureGoldContainerDark,
-    onTertiaryContainer = NatureGoldOnContainerDark,
-    background = NatureBackgroundDark,
-    surface = NatureSurfaceDark,
-    surfaceVariant = NatureSurfaceVariantDark,
-    onBackground = NatureOnSurfaceDark,
-    onSurface = NatureOnSurfaceDark,
-    onSurfaceVariant = NatureOnSurfaceVariantDark
+    primary = NavyPrimaryDark,
+    onPrimary = NavyOnPrimaryDark,
+    primaryContainer = NavyContainerDark,
+    onPrimaryContainer = NavyOnContainerDark,
+    secondary = TealSecondaryDark,
+    onSecondary = TealOnSecondaryDark,
+    secondaryContainer = TealContainerDark,
+    onSecondaryContainer = TealOnContainerDark,
+    tertiary = GoldTertiaryDark,
+    onTertiary = GoldOnTertiaryDark,
+    tertiaryContainer = GoldContainerDark,
+    onTertiaryContainer = GoldOnContainerDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onBackground = OnSurfaceDark,
+    onSurface = OnSurfaceDark,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = NatureGreenPrimary,
-    onPrimary = NatureGreenOnPrimary,
-    primaryContainer = NatureGreenContainer,
-    onPrimaryContainer = NatureGreenOnContainer,
-    secondary = NatureTealSecondary,
-    onSecondary = NatureTealOnSecondary,
-    secondaryContainer = NatureTealContainer,
-    onSecondaryContainer = NatureTealOnContainer,
-    tertiary = NatureGoldTertiary,
-    onTertiary = NatureGoldOnTertiary,
-    tertiaryContainer = NatureGoldContainer,
-    onTertiaryContainer = NatureGoldOnContainer,
-    background = NatureBackgroundLight,
-    surface = NatureSurfaceLight,
-    surfaceVariant = NatureSurfaceVariantLight,
-    onBackground = NatureOnSurfaceLight,
-    onSurface = NatureOnSurfaceLight,
-    onSurfaceVariant = NatureOnSurfaceVariantLight
+    primary = NavyPrimary,
+    onPrimary = NavyOnPrimary,
+    primaryContainer = NavyContainer,
+    onPrimaryContainer = NavyOnContainer,
+    secondary = TealSecondary,
+    onSecondary = TealOnSecondary,
+    secondaryContainer = TealContainer,
+    onSecondaryContainer = TealOnContainer,
+    tertiary = GoldTertiary,
+    onTertiary = GoldOnTertiary,
+    tertiaryContainer = GoldContainer,
+    onTertiaryContainer = GoldOnContainer,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onBackground = OnSurfaceLight,
+    onSurface = OnSurfaceLight,
 )
 
 @Composable
 fun A2UITheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    dynamicColor: Boolean = false,
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -71,6 +66,6 @@ fun A2UITheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }
